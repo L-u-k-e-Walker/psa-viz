@@ -49,9 +49,16 @@ END_LABEL = {  # (bottom, top) flow annotations: (text, colour key or None)
 }
 
 
-def time_map(frac_video):
-    """Video time fraction -> cycle time fraction (linear for now)."""
-    return frac_video
+FPS, SECONDS = 30, 20
+STEP_VIDEO_S = np.array([4.0, 6.0, 4.0, 6.0])  # user choice: stretch the pressure-changing steps
+
+
+def time_map(frac_video, cyc):
+    """Video time fraction [0, 1) -> cycle time (s). Each step is linear inside its video slot."""
+    tv = frac_video * STEP_VIDEO_S.sum()
+    edges = np.concatenate([[0.0], np.cumsum(STEP_VIDEO_S)])
+    s = int(min(np.searchsorted(edges, tv, side="right") - 1, 3))
+    return cyc.starts[s] + (tv - edges[s]) / STEP_VIDEO_S[s] * cyc.dur[s]
 
 
 class Composer:
@@ -206,8 +213,55 @@ class Composer:
                  va="bottom")
 
 
-def frame_times(n):
-    return np.array([time_map(i / n) for i in range(n)])
+def precompute_dots(cyc, path, n_frames):
+    """Run the gas molecules through one warm-up cycle, then store one full cycle of frames."""
+    from scene import Packing
+    dots = GasDots(Packing())
+    P_H_C = cyc.P_H * 1e5 / cyc.m.RT
+    dots.reset(cyc.state(time_map(0.0, cyc)), P_H_C)
+    pos, sp, off = [], [], [0]
+    for f in range(2 * n_frames):
+        st = cyc.state(time_map((f % n_frames) / n_frames, cyc))
+        dots.advance(st, P_H_C, 1.0 / FPS, cyc.case.bed_void)
+        if f >= n_frames:
+            pos.append(dots.pos.astype(np.float32))
+            sp.append(dots.sp.astype(np.int8))
+            off.append(off[-1] + len(dots.pos))
+    np.savez_compressed(path, pos=np.concatenate(pos), sp=np.concatenate(sp), off=np.array(off),
+                        r_dot=dots.r_dot)
+
+
+def worker(theme, a, b, n_frames, outdir):
+    from types import SimpleNamespace
+    cyc = CycleData()
+    scene = BedScene(theme, R3D)
+    comp = Composer(theme, cyc, scene)
+    d = np.load(HERE / "frames" / "dots.npz")
+    for f in range(a, b):
+        out = outdir / f"f_{f:04d}.png"
+        if out.exists():
+            continue
+        st = cyc.state(time_map(f / n_frames, cyc))
+        o0, o1 = d["off"][f], d["off"][f + 1]
+        dots = SimpleNamespace(pos=d["pos"][o0:o1].astype(float), sp=d["sp"][o0:o1].astype(int),
+                               r_dot=float(d["r_dot"]))
+        scene.set_state(st, cyc, dots)
+        tmp = outdir / f"_3d_{f:04d}.png"
+        scene.render(tmp)
+        comp.draw(st, plt.imread(tmp), out)
+        tmp.unlink()
+
+
+def assemble(frames, stem, fps=FPS, gif_width=1920, gif_fps=15):
+    mp4, gif = HERE / f"{stem}.mp4", HERE / f"{stem}.gif"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(frames / "f_%04d.png"),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow",
+                    "-movflags", "+faststart", str(mp4)], check=True)
+    vf = (f"fps={gif_fps},scale={gif_width}:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256:"
+          f"stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(frames / "f_%04d.png"),
+                    "-vf", vf, str(gif)], check=True)
+    return mp4, gif
 
 
 def render_one(theme, t_cycle_s, out, dots_state=None, cyc=None, scene=None, comp=None, dots=None):
@@ -230,7 +284,35 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--theme", default="dark", choices=list(THEMES))
     ap.add_argument("--t", type=float, nargs="*", default=[3.0, 52.0, 62.0, 105.0])
+    ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--worker", type=int, nargs=2, default=None)
+    ap.add_argument("--gif-width", type=int, default=1920)
     args = ap.parse_args()
+    n_frames = FPS * SECONDS
+    outdir = HERE / "frames" / args.theme
+    if args.worker is not None:
+        worker(args.theme, *args.worker, n_frames, outdir)
+        return
+    if args.all:
+        outdir.mkdir(parents=True, exist_ok=True)
+        cyc = CycleData()
+        dpath = HERE / "frames" / "dots.npz"
+        if not dpath.exists():
+            t0 = time.time()
+            precompute_dots(cyc, dpath, n_frames)
+            print(f"gas molecules precomputed ({time.time() - t0:.0f}s)", flush=True)
+        t0 = time.time()
+        edges = np.linspace(0, n_frames, args.workers + 1).astype(int)
+        env = dict(os.environ, OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1")
+        procs = [subprocess.Popen([sys.executable, "-I", __file__, "--theme", args.theme, "--worker", str(a), str(b)],
+                                  env=env) for a, b in zip(edges[:-1], edges[1:])]
+        codes = [p.wait() for p in procs]
+        n_done = len(list(outdir.glob("f_*.png")))
+        print(f"{args.theme}: {n_done}/{n_frames} frames in {time.time() - t0:.0f}s, worker exit codes {codes}", flush=True)
+        if n_done == n_frames:
+            mp4, gif = assemble(outdir, f"psa_column_{args.theme}", gif_width=args.gif_width)
+            print(mp4.name, f"{mp4.stat().st_size / 1e6:.1f} MB", gif.name, f"{gif.stat().st_size / 1e6:.1f} MB")
+        return
     cyc = CycleData()
     if args.stills:
         for theme in (["dark", "white"] if args.theme == "dark" else [args.theme]):

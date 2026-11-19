@@ -1,0 +1,136 @@
+{
+ "psa_column_dark.mp4": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 600,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "fps": 30.0,
+  "duration_s": 20.0,
+  "size_MB": 8.8,
+  "checks": {
+   "size": true,
+   "frames": true,
+   "duration": true,
+   "h264": true,
+   "yuv420p": true,
+   "all_png_frames": true
+  }
+ },
+ "psa_column_dark.gif": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 300,
+  "codec": "gif",
+  "pix_fmt": "bgra",
+  "fps": 15.0,
+  "duration_s": 20.0,
+  "size_MB": 28.37,
+  "checks": {
+   "size": true,
+   "duration": true,
+   "under_50MB": true
+  }
+ },
+ "psa_column_white.mp4": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 600,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "fps": 30.0,
+  "duration_s": 20.0,
+  "size_MB": 10.62,
+  "checks": {
+   "size": true,
+   "frames": true,
+   "duration": true,
+   "h264": true,
+   "yuv420p": true,
+   "all_png_frames": true
+  }
+ },
+ "psa_column_white.gif": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 300,
+  "codec": "gif",
+  "pix_fmt": "bgra",
+  "fps": 15.0,
+  "duration_s": 20.0,
+  "size_MB": 29.6,
+  "checks": {
+   "size": true,
+   "duration": true,
+   "under_50MB": true
+  }
+ },
+ "psa_particles_dark.mp4": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 600,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "fps": 30.0,
+  "duration_s": 20.0,
+  "size_MB": 4.37,
+  "checks": {
+   "size": true,
+   "frames": true,
+   "duration": true,
+   "h264": true,
+   "yuv420p": true,
+   "all_png_frames": true
+  }
+ },
+ "psa_particles_dark.gif": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 300,
+  "codec": "gif",
+  "pix_fmt": "bgra",
+  "fps": 15.0,
+  "duration_s": 20.0,
+  "size_MB": 31.51,
+  "checks": {
+   "size": true,
+   "duration": true,
+   "under_50MB": true
+  }
+ },
+ "psa_particles_white.mp4": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 600,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "fps": 30.0,
+  "duration_s": 20.0,
+  "size_MB": 6.07,
+  "checks": {
+   "size": true,
+   "frames": true,
+   "duration": true,
+   "h264": true,
+   "yuv420p": true,
+   "all_png_frames": true
+  }
+ },
+ "psa_particles_white.gif": {
+  "width": 1920,
+  "height": 1080,
+  "frames": 300,
+  "codec": "gif",
+  "pix_fmt": "bgra",
+  "fps": 15.0,
+  "duration_s": 20.0,
+  "size_MB": 36.59,
+  "checks": {
+   "size": true,
+   "duration": true,
+   "under_50MB": true
+  }
+ },
+ "labels": "legends in both visuals read 'A  heavy \u00b7 extract' and 'B  light \u00b7 raffinate' (psaviz.style.SPECIES_LABEL); column flow arrows name Raffinate/Extract/Purge",
+ "pass": true
+}

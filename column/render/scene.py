@@ -120,30 +120,36 @@ class GasDots:
         self.pos, self.sp = np.zeros((0, 3)), np.zeros(0, int)
         self.match(st, P_H_C)
 
-    def match(self, st, P_H_C):
+    def match(self, st, P_H_C, band=0.08):
+        """Births/deaths only when a bin leaves a +-band around its target (no frame-to-frame flicker)."""
         tA, tB = self.targets(st, P_H_C)
         b = np.clip(np.digitize(self.pos[:, 2], self.edges) - 1, 0, self.nbins - 1)
         keep = np.ones(len(self.pos), bool)
         new_p, new_s = [], []
         for bb in range(self.nbins):
             for s, tgt in ((0, tA[bb]), (1, tB[bb])):
-                want = int(np.floor(tgt + self.rng.random()))
+                tol = max(1.0, band * tgt)
                 have = np.nonzero((b == bb) & (self.sp == s) & keep)[0]
-                if len(have) > want:
-                    keep[self.rng.choice(have, len(have) - want, replace=False)] = False
-                elif want > len(have):
-                    p, sp = self._spawn(bb, want - len(have), s)
+                if len(have) > tgt + tol:
+                    n_kill = len(have) - int(np.ceil(tgt + tol * 0.5))
+                    keep[self.rng.choice(have, n_kill, replace=False)] = False
+                elif len(have) < tgt - tol:
+                    p, sp = self._spawn(bb, int(np.floor(tgt - tol * 0.5)) - len(have), s)
                     new_p.append(p)
                     new_s.append(sp)
         self.pos = np.concatenate([self.pos[keep]] + new_p) if new_p else self.pos[keep]
         self.sp = np.concatenate([self.sp[keep]] + new_s) if new_s else self.sp[keep]
 
-    def advance(self, st, P_H_C, dt_video, speed):
-        """Drift with the interstitial gas velocity (x speed), small Brownian jitter, then re-match."""
+    def advance(self, st, P_H_C, dt_video, eps, k=0.18, vmax=0.6, jitter=0.025):
+        """Drift with the interstitial gas velocity, then re-match the targets.
+
+        Video speed (bed lengths per video second) = vmax tanh(k u/eps / vmax), u in m/s for the
+        1 m bed: watchable and monotonic in the real velocity, not to scale."""
         zz = np.linspace(0, 1, len(st["u"]))
-        u = np.interp(self.pos[:, 2] / self.p.H, zz, st["u"])
-        self.pos[:, 2] += speed * u * dt_video * self.p.H
-        self.pos += self.rng.normal(0, 0.04, self.pos.shape)
+        u = np.interp(self.pos[:, 2] / self.p.H, zz, st["u"]) / eps
+        v = vmax * np.tanh(k * u / vmax)
+        self.pos[:, 2] += v * dt_video * self.p.H
+        self.pos += self.rng.normal(0, jitter, self.pos.shape)
         ok = (self.pos[:, 2] > 0) & (self.pos[:, 2] < self.p.H)
         r = np.hypot(self.pos[:, 0], self.pos[:, 1])
         ok &= (r < self.p.R - 0.2) & (self.pos[:, 1] > self.y0) & (self.pos[:, 1] < self.y1)
