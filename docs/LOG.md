@@ -31,3 +31,17 @@ Gate evidence and decisions, newest last.
   - G1e PASS: vs psa-sim at N = 120: purity diff 4e-6 pp, recovery diff 2e-5 pp,
     y_A max abs diff 1.0e-6 over all stored times, P 4.4e-7 rel, tank pre-fill 28.9703 s in both.
 - CSS render state saved in `column/run/css_state.npz` (+ metrics.json, cycle_history.csv).
+
+## 2026-11-19 Phase 2: particle models
+
+- `psaviz/particle.py`: `MacroporeParticle` (pore diffusion + fast crystal LDF) and
+  `MicroporeParticle` (Maxwell–Stefan/Langmuir flux), spherical finite volumes, BDF with
+  banded Jacobian sparsity; < 0.3 s per solve. Cases in `psaviz/cases.py`, provenance in docs/INPUTS.md.
+- `particle/run/run_uptake.py` → uptake.csv, uptake_metrics.json.
+- **Gate evidence** (`particle/run/gates_phase2.json`):
+  - G2a PASS: held moles vs integrated surface inflow, rel err 3.6e-11 (eq) / 7.6e-10 (kin) (limit 1e-4).
+  - G2b PASS: linear single-component limit vs Crank, tau 1e-4..1.5: max |dF| 0.0024 (macropore) / 0.0024 (micropore) (limit 0.005).
+  - G2c PASS: final loadings = extended Langmuir to 3e-16 / 1.3e-11 rel (limit 5e-3).
+  - G2d PASS: N 100 vs 200: max |dq/q_s| 3.0e-4 / 1.4e-3 (limit 5e-3).
+  - G2e PASS: equilibrium final S = 10.0 (>= 3); kinetic S = 9.26 at t = 13.9 s (A at 90 % of peak) (>= 3),
+    final S = 1.00 (0.7–1.4). Overshoots: B 1.23x (equilibrium), A 1.43x (kinetic).

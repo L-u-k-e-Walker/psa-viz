@@ -42,3 +42,25 @@ mass transfer, ideal gas.
 The 3D bed in the column render is schematic. Its particles are drawn far
 larger than 2 mm pellets in a 0.2 m column would be, so that they are visible.
 Colours come from the solver's profiles at each particle's height z/L.
+
+## Particles (`psaviz.cases.equilibrium_particle`, `kinetic_particle`)
+
+Both start clean. At t = 0 their surface sees the column feed (y_A = 0.30,
+4.2 bar, 298.15 K), held constant (standalone uptake experiment, not driven by
+the column).
+
+| Input | Equilibrium-selective (left) | Kinetic-selective (right) | Source |
+|---|---|---|---|
+| Model | macropore diffusion + crystal LDF | micropore (adsorbed-phase) diffusion, Maxwell–Stefan/Langmuir flux | assumed: the usual controlling resistance for each class (zeolite pellet vs carbon molecular sieve) |
+| Radius | 1.0 mm | 1.0 mm | assumed: equal so they compare directly |
+| Porosity, density | ε_p 0.35, ρ_p 1100 kg/m³ | ρ_p 1100 kg/m³ | assumed |
+| Isotherm | b_A 0.60, b_B 0.06 /bar, q_s 3 (same as column) | b_A = b_B = 0.25 /bar, q_s 3 | assumed: selectivity 10 vs 1 at equilibrium |
+| Transport | D_p = 1.7e-6 m²/s for A and B; crystal LDF 100 /s | Đ_A/R² = 1e-2 /s, Đ_B/R² = 1e-4 /s | assumed: D_p from Bosanquet (Knudsen in ~0.1 µm pores + molecular at ~4 bar, tortuosity 3), equal for equal molar masses; Đ ratio 100 (CMS O2/N2 is ~30–100) |
+| Grid | 100 shells | 100 shells | numerical, grid-checked (G2d) |
+
+Outcomes (`particle/run/uptake_metrics.json`): equilibrium particle, B
+overshoots to 1.23x its final loading at ~2 s and is displaced as A arrives
+(A half-time 1.1 s, done by ~30 s, final S = 10). Kinetic particle: A
+overshoots to 1.43x its final loading at ~36 s, then is slowly displaced by B
+(B half-time 230 s, done by ~10^4 s, final S = 1). Both overshoots are
+predicted by the models, not added for the visual.
