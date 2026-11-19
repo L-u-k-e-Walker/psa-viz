@@ -11,6 +11,8 @@ import warnings
 warnings.filterwarnings("ignore", message=".*OVITO.*PyPI")
 
 import argparse  # noqa: E402
+import os  # noqa: E402
+import subprocess  # noqa: E402
 import sys  # noqa: E402
 import time  # noqa: E402
 from pathlib import Path  # noqa: E402
@@ -31,6 +33,29 @@ W, H = 1920, 1080
 TAU = 1.14  # s, A uptake half-time of the equilibrium particle (kinetic: 1.05 s)
 TITLES = [("Equilibrium-selective", "A held more strongly · equal diffusion"),
           ("Kinetic-selective", "A diffuses 100x faster · equal affinity")]
+
+
+FPS, SECONDS = 30, 20
+N_HOLD0, N_HOLD1 = 21, 60  # frames held on clean particles / at the end (user choice: log clock)
+LOG_T0, LOG_T1 = -3.0, 4.4  # log10(t / tau_A) sweep
+
+
+def frame_time(f, n=FPS * SECONDS):
+    """Frame -> time (s): hold at 0, log sweep, hold at the end."""
+    n_sweep = n - N_HOLD0 - N_HOLD1
+    if f < N_HOLD0:
+        return 0.0
+    k = min(f - N_HOLD0, n_sweep - 1)
+    return TAU * 10 ** (LOG_T0 + (LOG_T1 - LOG_T0) * k / (n_sweep - 1))
+
+
+def clock_text(x):
+    """0 | 0.0011 | 0.36 | 9.7 | 35 | 190 | 2,500 | 25,000 (never scientific notation)."""
+    if x <= 0:
+        return "0"
+    if x >= 100:
+        return f"{x:,.0f}"
+    return f"{x:.2g}"
 
 
 class ParticleData:
@@ -77,7 +102,7 @@ class Composer:
                 self._tags(fig, k)
                 self._uptake(fig, k, t, j)
             # clock
-            ttxt = "0" if t <= 0 else (f"{t / TAU:.2g}" if t / TAU < 1000 else f"{t / TAU:.1e}".replace("e+0", "e"))
+            ttxt = clock_text(t / TAU)
             fig.text(0.5, 1 - 40 / H, f"t / τ$_A$ = {ttxt}", ha="center", va="top", fontsize=19,
                      color=T["ink"], family="DejaVu Sans Mono")
             self._legend(fig)
@@ -137,16 +162,90 @@ class Composer:
                  color=T["ink2"])
 
 
+def scene_args():
+    return dict(sep=3.6, px_per_unit=225.0, y_shift_px=125)
+
+
+def precompute_bath(path, n_frames):
+    from scene_particle import GasBath
+    sep = scene_args()["sep"]
+    bath = GasBath(np.array([[-sep / 2, 0, 0], [sep / 2, 0, 0]]), [[-3.4, 3.4], [-1.3, 1.5], [-1.12, 1.12]])
+    pos = np.empty((n_frames,) + bath.pos.shape, np.float32)
+    for f in range(n_frames):
+        bath.advance(0.5)
+        pos[f] = bath.pos
+    np.savez_compressed(path, pos=pos, sp=bath.sp)
+
+
+def worker(theme, a, b, n_frames, outdir):
+    times = [frame_time(f, n_frames) for f in range(n_frames)]
+    data = ParticleData(times)
+    sc = ParticleScene(theme, (W, H), **scene_args())
+    comp = Composer(theme, sc, data)
+    bp = np.load(HERE / "frames" / "bath.npz")
+    sc.bath.sp = bp["sp"]
+    for f in range(a, b):
+        out = outdir / f"f_{f:04d}.png"
+        if out.exists():
+            continue
+        t = times[f]
+        prof, j = data.at(t)
+        sc.bath.pos = bp["pos"][f].astype(float)
+        sc.build(prof)
+        tmp = outdir / f"_3d_{f:04d}.png"
+        sc.render(tmp)
+        comp.draw(plt.imread(tmp), t, j, out)
+        tmp.unlink()
+
+
+def assemble(frames, stem, fps=FPS, gif_width=1920, gif_fps=15):
+    mp4, gif = HERE / f"{stem}.mp4", HERE / f"{stem}.gif"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(frames / "f_%04d.png"),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow",
+                    "-movflags", "+faststart", str(mp4)], check=True)
+    vf = (f"fps={gif_fps},scale={gif_width}:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256:"
+          f"stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(frames / "f_%04d.png"),
+                    "-vf", vf, str(gif)], check=True)
+    return mp4, gif
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stills", action="store_true")
     ap.add_argument("--theme", default="dark", choices=list(THEMES))
     ap.add_argument("--t", type=float, nargs="*", default=[0.3, 3.0, 40.0, 3000.0])
+    ap.add_argument("--all", action="store_true")
+    ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--worker", type=int, nargs=2, default=None)
+    ap.add_argument("--gif-width", type=int, default=1920)
     args = ap.parse_args()
+    n_frames = FPS * SECONDS
+    outdir = HERE / "frames" / args.theme
+    if args.worker is not None:
+        worker(args.theme, *args.worker, n_frames, outdir)
+        return
+    if args.all:
+        outdir.mkdir(parents=True, exist_ok=True)
+        bpath = HERE / "frames" / "bath.npz"
+        if not bpath.exists():
+            precompute_bath(bpath, n_frames)
+        t0 = time.time()
+        edges = np.linspace(0, n_frames, args.workers + 1).astype(int)
+        env = dict(os.environ, OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1")
+        procs = [subprocess.Popen([sys.executable, "-I", __file__, "--theme", args.theme, "--worker", str(a), str(b)],
+                                  env=env) for a, b in zip(edges[:-1], edges[1:])]
+        codes = [p.wait() for p in procs]
+        n_done = len(list(outdir.glob("f_*.png")))
+        print(f"{args.theme}: {n_done}/{n_frames} frames in {time.time() - t0:.0f}s, worker exit codes {codes}", flush=True)
+        if n_done == n_frames:
+            mp4, gif = assemble(outdir, f"psa_particles_{args.theme}", gif_width=args.gif_width)
+            print(mp4.name, f"{mp4.stat().st_size / 1e6:.1f} MB", gif.name, f"{gif.stat().st_size / 1e6:.1f} MB")
+        return
     if args.stills:
         data = ParticleData(args.t)
         for theme in (["dark", "white"] if args.theme == "dark" else [args.theme]):
-            sc = ParticleScene(theme, (W, H), sep=3.6, px_per_unit=225.0, y_shift_px=125)
+            sc = ParticleScene(theme, (W, H), **scene_args())
             comp = Composer(theme, sc, data)
             for t in args.t:
                 t0 = time.time()

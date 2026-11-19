@@ -1,5 +1,7 @@
 # psa-viz mission
 
+**Status (2026-11-19): phases 0–4 done, all gates passed (evidence in docs/LOG.md); Phase 5 docs done, push pending user OK.**
+
 Source of truth for this project. Two rendered visuals of PSA dynamics for a
 generic binary mixture:
 

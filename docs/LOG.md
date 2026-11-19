@@ -71,3 +71,28 @@ Gate evidence and decisions, newest last.
   fresh solve at t = 0.3, 3, 3000 s: 2.2e-9 (limit 1e-6). Loop seam of the CSS cycle 2.0e-7
   (normalized). Stills: column/render/still_{dark,white}_t{003,052,062,105}.png,
   particle/render/still_{dark,white}_t{0.3,3,40,3000}.png.
+
+## 2026-11-19 Style checkpoint (user answers)
+
+All four recommended options: column video stretches the pressure-changing steps
+(4 / 6 / 4 / 6 s of video for 10 / 50 / 10 / 50 s of cycle; on-screen t/t_cycle stays true);
+gas molecules kept and drifting with the flow; particle faces keep gradient + adsorbed molecules;
+particle clock log t/tau_A (0.7 s hold, sweep 10^-3 to 10^4.4, 2 s end hold).
+
+## 2026-11-19 Phase 4: final renders
+
+- Column: `render_column.py --all` (precomputes the molecule history over a warm-up cycle +
+  one stored cycle in frames/dots.npz, so parallel workers agree; births/deaths only when a
+  height bin leaves a +-8 % band around its target, to avoid flicker; drift speed
+  0.6 tanh(0.18 u_int/0.6) bed lengths per video second). 4 workers per theme (Tachyon already
+  uses every core): 676 s (dark), 678 s (white). Loop seam checked visually (frame 599 vs 0:
+  identical profiles and pressure).
+- Particles: `render_particle.py --all` (gas-bath history in frames/bath.npz): ~2400 s per theme.
+  Clock text 100–999 showed "1.9e+02"; fixed (`clock_text`: never scientific notation) before the
+  white run started, and dark frames 371–599 re-rendered (769 s).
+- **Gate 4 PASS** (`tools/gate4_qc.py` → docs/gate4_qc.json): all 4 MP4s 1920x1080, 600 frames,
+  30 fps, 20.0 s, h264 yuv420p, 600/600 PNG frames; all 4 GIFs 1920x1080 (not downscaled),
+  300 frames at 15 fps, 20.0 s, 28.4–36.6 MB (< 50 MB). Legends read "A  heavy · extract" and
+  "B  light · raffinate"; column flow arrows name raffinate, extract and purge.
+- Outputs: column/render/psa_column_{dark,white}.{mp4,gif} (MP4 8.8 / 10.6 MB),
+  particle/render/psa_particles_{dark,white}.{mp4,gif} (MP4 4.4 / 6.1 MB).
