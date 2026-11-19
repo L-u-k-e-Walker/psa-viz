@@ -1,0 +1,215 @@
+{
+ "name": "psaviz_crosscheck_N120",
+ "description": "Single-column 4-step Skarstrom cycle equivalent to psaviz.cases.column_case (cross-check only)",
+ "components": [
+  {
+   "name": "B",
+   "mw": 30.0,
+   "cp": 29.1,
+   "cv": 20.8,
+   "dH": 0.0,
+   "z": 1.0,
+   "k_ldf": 4.924271572279613
+  },
+  {
+   "name": "A",
+   "mw": 30.0,
+   "cp": 29.1,
+   "cv": 20.8,
+   "dH": 0.0,
+   "z": 1.0,
+   "k_ldf": 0.3465992308714383
+  }
+ ],
+ "feed": {
+  "y": [
+   0.7,
+   0.3
+  ],
+  "temperature": 298.15,
+  "density": 1.2,
+  "viscosity": 1.8e-05
+ },
+ "products": {
+  "n_light_keys": 1,
+  "y_raffinate": [
+   1.0,
+   0.0
+  ],
+  "y_extract": [
+   0.0,
+   1.0
+  ]
+ },
+ "adsorbent": {
+  "name": "generic",
+  "pellet_diameter": 0.002,
+  "pellet_density": 1100.0,
+  "bulk_density": 660.0,
+  "solid_cp": 900.0,
+  "mass_transfer_resistance": 1,
+  "macropore_void": 0.0,
+  "micropore_void": 0.0,
+  "isotherm": {
+   "model": "langmuir",
+   "params": [
+    {
+     "qs": 3.0,
+     "b": 0.06,
+     "dH": 0.0
+    },
+    {
+     "qs": 3.0,
+     "b": 0.6,
+     "dH": 0.0
+    }
+   ],
+   "t_ref": 298.15,
+   "temperature_dependent": false,
+   "validity": null
+  }
+ },
+ "column": {
+  "n_columns": 1,
+  "height": 1.0,
+  "inner_radius": 0.1,
+  "outer_radius": 0.11,
+  "bed_void": 0.4,
+  "adsorbent_mass": 20.734511513692638,
+  "wall_density": 7830.0,
+  "wall_cp": 500.0,
+  "h_in": 0.0,
+  "h_out": 0.0,
+  "p_high": 4.2,
+  "p_low": 1.0,
+  "temperature": 298.15,
+  "initial_condition": [
+   5
+  ],
+  "p_high_set": null,
+  "p_high_full": null,
+  "p_low_set": null,
+  "p_low_full": null
+ },
+ "feed_tank": {
+  "inner_radius": 0.5,
+  "outer_radius": 0.505,
+  "height": 1.2732395447351628,
+  "pressure": 4.3,
+  "temperature": 298.15,
+  "initial_condition": 1,
+  "wall_density": 7830.0,
+  "wall_cp": 500.0,
+  "h_in": 0.0,
+  "h_out": 0.0,
+  "p_set": null,
+  "p_full": null,
+  "cv_full": null
+ },
+ "raffinate_tank": {
+  "inner_radius": 0.5,
+  "outer_radius": 0.505,
+  "height": 1.2732395447351628,
+  "pressure": 3.9,
+  "temperature": 298.15,
+  "initial_condition": 2,
+  "wall_density": 7830.0,
+  "wall_cp": 500.0,
+  "h_in": 0.0,
+  "h_out": 0.0,
+  "p_set": null,
+  "p_full": null,
+  "cv_full": null
+ },
+ "extract_tank": {
+  "inner_radius": 0.5,
+  "outer_radius": 0.505,
+  "height": 1.2732395447351628,
+  "pressure": 1.0,
+  "temperature": 298.15,
+  "initial_condition": 2,
+  "wall_density": 7830.0,
+  "wall_cp": 500.0,
+  "h_in": 0.0,
+  "h_out": 0.0,
+  "p_set": null,
+  "p_full": null,
+  "cv_full": null
+ },
+ "machines": {
+  "feed_compressor_efficiency": 0.75,
+  "extract_compressor_efficiency": 0.75,
+  "vacuum_pump_efficiency": 0.75,
+  "feed_compressor_stages": 1,
+  "extract_compressor_stages": 1,
+  "vacuum_pump_stages": 1,
+  "vacuum_pressure": 1.0,
+  "feed_compression": false,
+  "recover_extract": false,
+  "vacuum": false
+ },
+ "ambient": {
+  "temperature": 298.15,
+  "pressure": 1.01325,
+  "t_std": 273.15,
+  "p_std": 1.01325
+ },
+ "cycle": {
+  "durations": [
+   10.0,
+   50.0,
+   10.0,
+   50.0
+  ],
+  "steps": [
+   [
+    "RP-FEE-XXX",
+    "HP-FEE-RAF",
+    "DP-ATM-XXX",
+    "LP-ATM-RAF"
+   ]
+  ],
+  "valve_feed": [
+   [
+    1.5,
+    7.0,
+    5.0,
+    "free"
+   ]
+  ],
+  "valve_product": [
+   [
+    0,
+    "free",
+    0,
+    0.11
+   ]
+  ],
+  "flow_dir": [
+   [
+    0,
+    0,
+    1,
+    1
+   ]
+  ],
+  "step_type": null,
+  "events": null,
+  "max_cycles": 200
+ },
+ "numerics": {
+  "n_cells": 120,
+  "rtol": 1e-06,
+  "atol": 1e-09,
+  "css_tol": 1e-14,
+  "css_metric": "all",
+  "css_inventory_tol": 0.001,
+  "n_time_points": 51,
+  "method": "BDF",
+  "topsail_compat": false
+ },
+ "options": {
+  "energy_balance": false,
+  "pressure_drop": "none"
+ }
+}
