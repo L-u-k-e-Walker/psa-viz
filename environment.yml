@@ -1,0 +1,18 @@
+# Env `viz` (shared with lilsx-n2). psaviz itself needs only numpy + scipy.
+name: viz
+channels: [conda-forge]
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - matplotlib
+  - pytest
+  - ffmpeg
+  - pillow
+  - libopengl
+  - libegl
+  - libgl
+  - pip
+  - pip:
+      - ovito==3.17.2
+# after creating: conda env config vars set -n viz LD_LIBRARY_PATH=<env prefix>/lib
