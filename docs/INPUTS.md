@@ -1,0 +1,44 @@
+# Inputs and where they come from
+
+**Nothing in this project is measured.** The species are generic (A, B), and
+every number is either *assumed* (an illustrative value, chosen to look like a
+real sorbent class, with the reason given) or *calculated* from other inputs.
+The visuals show mechanisms, not a specific material. Code: `psaviz/cases.py`.
+
+A = heavy component = extract (more strongly adsorbed in the column and the
+equilibrium particle, faster in the kinetic particle). B = light component =
+raffinate (the product of the feed step).
+
+## Column (`psaviz.cases.column_case`)
+
+| Input | Value | Source |
+|---|---|---|
+| Bed length, radius | 1.0 m, 0.10 m (L/D = 5) | assumed |
+| Bed void ε | 0.40 | assumed: typical random packing of spheres |
+| Pellet density ρ_p | 1100 kg/m³ | assumed: zeolite-pellet-like |
+| Temperature | 298.15 K, isothermal | assumed (user choice: no energy balance) |
+| Isotherm | extended Langmuir, q_s = 3.0 mol/kg (A and B), b_A = 0.60 /bar, b_B = 0.06 /bar | assumed: Henry selectivity b_A/b_B = 10 gives a clear separation; equal q_s keeps the extended Langmuir model thermodynamically consistent |
+| LDF k_A, k_B | 0.347 /s, 4.92 /s | **calculated**: Glueckauf from the pellet below, k_i = 15 ε_p D_p / (R_p² (ε_p + ρ_p Δq_i/Δc_i)), chord from pure B at 1 bar to feed at 4.2 bar. Same pore diffusivity for A and B, so the difference is the isotherm slope |
+| Feed | y_A = 0.30 | assumed |
+| Feed header | 4.3 bar, constant | assumed |
+| Vent (feed end) | 1.0 bar | assumed |
+| Light-product tank | 1.0 m³, set pressure 3.9 bar | assumed: large enough that the purge draws it down by < 10 % |
+| Initial state | pure B at 1 bar, equilibrated; tank pure B at 3.9 bar | assumed (CSS does not depend on it) |
+| Steps (duration, valve Cv) | RP 10 s, 1.5 · FEED 50 s, 7.0 · BD 10 s, 5.0 · PURGE 50 s, 0.11 mol/(s·bar) | assumed: tuned so the A front reaches ~0.6 L at the end of feed, B purity > 99.5 % and recovery ~ 34 % (realistic for a 4-step Skarstrom cycle at pressure ratio ~4) |
+| Grid | 120 cells, first-order upwind (≈ axial dispersion with Pe ≈ 240) | numerical choice, grid-checked (G1d) |
+
+Outcomes, not inputs: the column reaches **P_H = 4.208 bar** at the end of
+pressurization and stays there in feed (feed flow = Cv (4.3 − P_H)); blowdown
+ends at **1.009 bar**. On screen, pressure is shown as P/P_H with P_H = 4.208 bar.
+CSS performance: B purity 99.858 %, B recovery 33.8 %, extract 39.3 % A,
+molar purge/feed 0.33 (`column/run/metrics.json`).
+
+Simplifications (all as in psa-sim's flow-controlled, isothermal,
+no-pressure-drop mode): no momentum balance (uniform pressure along the bed),
+gas in the pellet pores neglected in the column balance, linear valves, LDF
+mass transfer, ideal gas.
+
+### Render geometry
+The 3D bed in the column render is schematic. Its particles are drawn far
+larger than 2 mm pellets in a 0.2 m column would be, so that they are visible.
+Colours come from the solver's profiles at each particle's height z/L.

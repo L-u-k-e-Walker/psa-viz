@@ -1,0 +1,36 @@
+{
+ "N": 120,
+ "psasim_cycles": 62,
+ "psaviz_cycles": 62,
+ "purity_B": {
+  "psaviz": 0.9985767416765997,
+  "psasim": 0.9985767015976237,
+  "diff_pp": 4.007897602686938e-06
+ },
+ "recovery_B": {
+  "psaviz": 0.3382030570916872,
+  "psasim": 0.3382032959644614,
+  "diff_pp": -2.388727742275165e-05
+ },
+ "yA_step_end_maxabs": {
+  "RP": 2.522548272210212e-07,
+  "FEED": 5.26854591870185e-07,
+  "BD": 9.259106289460917e-07,
+  "PURGE": 3.845563709414801e-07
+ },
+ "yA_all_times_maxabs": 1.008180241568457e-06,
+ "q_all_times_maxabs_mol_kg": 3.5890620487810665e-06,
+ "P_col_maxrel": 4.4100711823490757e-07,
+ "P_tank_maxrel": 3.722171615544882e-08,
+ "prefill_s": {
+  "psaviz": 28.970317617069114,
+  "psasim": 28.97030586221925
+ },
+ "criteria": {
+  "purity": true,
+  "recovery": true,
+  "yA": true,
+  "P": true
+ },
+ "G1e_pass": true
+}
