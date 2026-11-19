@@ -1,0 +1,69 @@
+{
+ "G2a": {
+  "rel_err": {
+   "equilibrium": 3.6441345132218145e-11,
+   "kinetic": 7.557364826174003e-10
+  },
+  "limit": 0.0001,
+  "pass": true
+ },
+ "G2b": {
+  "maxabs_macropore": 0.0023603605269052474,
+  "maxabs_micropore": 0.0023514898090077514,
+  "tau_range": [
+   0.0001,
+   1.5
+  ],
+  "limit": 0.005,
+  "pass": true
+ },
+ "G2c": {
+  "equilibrium": {
+   "final": [
+    1.1736700476091901,
+    0.2738563444421445
+   ],
+   "langmuir": [
+    1.1736700476091906,
+    0.2738563444421445
+   ],
+   "max_rel": 3.3306690738754696e-16
+  },
+  "kinetic": {
+   "final": [
+    0.4609756097594194,
+    1.0756097560838578
+   ],
+   "langmuir": [
+    0.46097560975609764,
+    1.075609756097561
+   ],
+   "max_rel": 1.2740031252178596e-11
+  },
+  "limit": 0.005,
+  "pass": true
+ },
+ "G2d": {
+  "maxabs_dq_over_qs": {
+   "equilibrium": 0.0003014620586020376,
+   "kinetic": 0.0014335316783097654
+  },
+  "limit": 0.005,
+  "pass": true
+ },
+ "G2e": {
+  "S_equilibrium_final": 9.999999999999993,
+  "t_A90_kinetic_s": 13.929858968793015,
+  "S_kinetic_at_tA90": 9.25887204074877,
+  "S_kinetic_final": 1.000000000019946,
+  "overshoot_B_equilibrium": 1.2298758876630111,
+  "overshoot_A_kinetic": 1.4279246940860064,
+  "limits": {
+   "S_eq_final": ">= 3",
+   "S_kin_at_tA90": ">= 3",
+   "S_kin_final": "0.7-1.4"
+  },
+  "pass": true
+ },
+ "all_pass": true
+}

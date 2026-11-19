@@ -83,3 +83,38 @@ def column_case(n_cells=120, **kw) -> ColumnCase:
         n_cells=n_cells, provenance=prov)
     args.update(kw)
     return ColumnCase(**args)
+
+
+# ---------------------------------------------------------------- particles
+PARTICLE_PROVENANCE = {
+    "both: radius": "assumed: 1 mm (2 mm particles); same size so the two compare directly",
+    "both: step": "assumed: clean particle, surface gas switched at t = 0 to the column feed (y_A 0.30, 4.2 bar)",
+    "equilibrium: porosity, density": "assumed: eps_p 0.35, rho_p 1100 kg/m^3 (zeolite pellet)",
+    "equilibrium: pore diffusivity": "assumed: D_p 1.7e-6 m^2/s for A and B (Bosanquet of Knudsen in ~0.1 um "
+                                     "pores and molecular diffusion at ~4 bar, tortuosity 3); equal because the "
+                                     "generic species have equal molar mass",
+    "equilibrium: isotherm": "assumed: same as the column (b_A/b_B = 10)",
+    "equilibrium: crystal LDF": "assumed: 100 /s, fast enough that the crystals are nearly at local equilibrium",
+    "kinetic: isotherm": "assumed: b_A = b_B = 0.25 /bar, q_s 3 mol/kg (equilibrium selectivity 1)",
+    "kinetic: diffusivities": "assumed: Đ_A/R^2 = 1e-2 /s, Đ_B/R^2 = 1e-4 /s (ratio 100; CMS O2/N2 is ~30-100)",
+    "kinetic: flux model": "Maxwell-Stefan/Langmuir without exchange correlations (Habgood-type)",
+}
+
+
+def equilibrium_particle(N=100, **kw):
+    from .particle import MacroporeParticle
+    p = PELLET
+    args = dict(radius=p["radius"], porosity=p["porosity"], density=p["density"],
+                pore_diffusivity=p["pore_diffusivity"], qs=p["qs"], b=p["b"], k_crystal=p["k_crystal"],
+                T=T, P=P_HIGH_NOMINAL, y=Y_FEED, N=N)
+    args.update(kw)
+    return MacroporeParticle(**args)
+
+
+def kinetic_particle(N=100, **kw):
+    from .particle import MicroporeParticle
+    p = KINETIC
+    args = dict(radius=p["radius"], density=p["density"], qs=p["qs"], b=p["b"], D_over_R2=p["D_over_R2"],
+                T=T, P=P_HIGH_NOMINAL, y=Y_FEED, N=N)
+    args.update(kw)
+    return MicroporeParticle(**args)

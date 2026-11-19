@@ -1,0 +1,41 @@
+{
+ "eq": {
+  "q_eq": [
+   1.1736700476091906,
+   0.2738563444421445
+  ],
+  "peak_qA": 1.17367005035857,
+  "t_peak_qA_s": 169.18543900327663,
+  "peak_qB": 0.33678615888783053,
+  "t_peak_qB_s": 1.9869127611417345,
+  "t_half_A_s": 1.1398338816516589,
+  "t_half_B_s": 0.10023997339039356
+ },
+ "kin": {
+  "q_eq": [
+   0.46097560975609764,
+   1.075609756097561
+  ],
+  "peak_qA": 0.6582393530002668,
+  "t_peak_qA_s": 35.787841150327125,
+  "peak_qB": 1.0756097575267913,
+  "t_peak_qB_s": 16397.065177695167,
+  "t_half_A_s": 1.051228062317866,
+  "t_half_B_s": 230.236741331774
+ },
+ "y_feed": [
+  0.3,
+  0.7
+ ],
+ "provenance": {
+  "both: radius": "assumed: 1 mm (2 mm particles); same size so the two compare directly",
+  "both: step": "assumed: clean particle, surface gas switched at t = 0 to the column feed (y_A 0.30, 4.2 bar)",
+  "equilibrium: porosity, density": "assumed: eps_p 0.35, rho_p 1100 kg/m^3 (zeolite pellet)",
+  "equilibrium: pore diffusivity": "assumed: D_p 1.7e-6 m^2/s for A and B (Bosanquet of Knudsen in ~0.1 um pores and molecular diffusion at ~4 bar, tortuosity 3); equal because the generic species have equal molar mass",
+  "equilibrium: isotherm": "assumed: same as the column (b_A/b_B = 10)",
+  "equilibrium: crystal LDF": "assumed: 100 /s, fast enough that the crystals are nearly at local equilibrium",
+  "kinetic: isotherm": "assumed: b_A = b_B = 0.25 /bar, q_s 3 mol/kg (equilibrium selectivity 1)",
+  "kinetic: diffusivities": "assumed: \u0110_A/R^2 = 1e-2 /s, \u0110_B/R^2 = 1e-4 /s (ratio 100; CMS O2/N2 is ~30-100)",
+  "kinetic: flux model": "Maxwell-Stefan/Langmuir without exchange correlations (Habgood-type)"
+ }
+}
