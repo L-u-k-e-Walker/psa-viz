@@ -1,0 +1,6 @@
+{
+ "column_periodicity_maxabs_normalized": 1.9857554406134867e-07,
+ "column_spotcheck_maxabs": 0.0,
+ "particle_spotcheck_maxabs": 2.1550495832300953e-09,
+ "pass": true
+}

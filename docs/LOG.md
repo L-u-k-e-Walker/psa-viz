@@ -45,3 +45,29 @@ Gate evidence and decisions, newest last.
   - G2d PASS: N 100 vs 200: max |dq/q_s| 3.0e-4 / 1.4e-3 (limit 5e-3).
   - G2e PASS: equilibrium final S = 10.0 (>= 3); kinetic S = 9.26 at t = 13.9 s (A at 90 % of peak) (>= 3),
     final S = 1.00 (0.7–1.4). Overshoots: B 1.23x (equilibrium), A 1.43x (kinetic).
+
+## 2026-11-19 Phase 3: render prototypes (style checkpoint)
+
+- Column (`column/render/`): `packing.py` (soft-sphere settling in a cylinder: 7757 spheres,
+  D/d = 14, bed L/D = 2.89, core packing fraction 0.66, max overlap 0.10 d),
+  `scene.py` (CSS cycle re-integrated from css_state.npz; gas dots whose density follows C(z,t)
+  and species follow y_A(z,t); OVITO bed cut away at y = 0, particles coloured by q_A/q_A,feed,
+  back half of a glass wall, caps, pipes, orthographic camera at 14 deg so z maps linearly to
+  screen rows), `render_column.py` (matplotlib composite: profile panels aligned with the bed
+  height, step list, P/P_H trace, flow arrows with A/B labels, legend, footnote).
+- Particles (`particle/render/`): `scene_particle.py` (orange-slice cutaway spheres as OVITO
+  meshes; left face A loading, right face B loading on one shared theta scale 0–0.42; adsorbed
+  molecules on fixed random sites shown when u < theta/0.42; gas bath random walk, 30 % A),
+  `render_particle.py` (titles, face tags, uptake curves on a log clock t/tau_A, legend).
+- Colours: dataviz reference palette slots 1–2 (A orange, B blue), surfaces and ink from the
+  palette; particle loading ramp in OKLab from the bare-sorbent grey to a darker step of the
+  species hue (so A molecules stay visible over A-loaded particles). Validator not run (no node);
+  the pair is documented as passing all-pairs CVD/normal-vision checks in both modes.
+- OVITO lessons: `TriangleMesh.set_vertex_colors` needs RGBA; `set_normals` needs (3·faces)×3;
+  after a render the source DataCollection is shared, so give the StaticSource a fresh clone per
+  frame; remove pipelines from the scene before building the next theme in the same process.
+- **Gate 3 PASS** (`tools/gate3_spotcheck.py` → docs/gate3_spotcheck.json): drawn column values
+  vs an independent re-integration at t = 3, 52, 105 s: max |diff| 0.0; particle profiles vs a
+  fresh solve at t = 0.3, 3, 3000 s: 2.2e-9 (limit 1e-6). Loop seam of the CSS cycle 2.0e-7
+  (normalized). Stills: column/render/still_{dark,white}_t{003,052,062,105}.png,
+  particle/render/still_{dark,white}_t{0.3,3,40,3000}.png.
