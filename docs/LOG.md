@@ -96,3 +96,8 @@ particle clock log t/tau_A (0.7 s hold, sweep 10^-3 to 10^4.4, 2 s end hold).
   "B  light · raffinate"; column flow arrows name raffinate, extract and purge.
 - Outputs: column/render/psa_column_{dark,white}.{mp4,gif} (MP4 8.8 / 10.6 MB),
   particle/render/psa_particles_{dark,white}.{mp4,gif} (MP4 4.4 / 6.1 MB).
+
+## 2026-11-19 Phase 5: docs and handoff
+
+- README (outputs, what is simulated vs not to scale, pipeline, re-render commands, provenance),
+  ../CLAUDE.md updated. Push pending: remote not created yet; ask the user first.

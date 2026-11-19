@@ -25,8 +25,9 @@ solvers in `psaviz/`.
 | Column | `column/render/psa_column_dark.{mp4,gif}` | `column/render/psa_column_white.{mp4,gif}` |
 | Particles | `particle/render/psa_particles_dark.{mp4,gif}` | `particle/render/psa_particles_white.{mp4,gif}` |
 
-1920x1080, 30 fps, 20 s (600 frames). GIFs are 15 fps; see docs/LOG.md for
-their size. Use the MP4s in PowerPoint. Stills: `column/render/still_*.png`,
+1920x1080, 20 s. MP4: 30 fps, 4–11 MB. GIF: 15 fps, full 1080p, 28–37 MB.
+The column video loops seamlessly (it is one CSS cycle). Use the MP4s in
+PowerPoint. Stills: `column/render/still_*.png`,
 `particle/render/still_*.png`.
 
 ## What is simulated
