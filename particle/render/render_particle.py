@@ -31,8 +31,10 @@ from psaviz.style import SPECIES_LABEL, THEMES, loading_ramp, mpl_rc  # noqa: E4
 
 W, H = 1920, 1080
 TAU = 1.14  # s, A uptake half-time of the equilibrium particle (kinetic: 1.05 s)
-TITLES = [("Equilibrium-selective", "A held more strongly · equal diffusion"),
-          ("Kinetic-selective", "A diffuses 100x faster · equal affinity")]
+TITLES = [("Equilibrium-selective", "A held 10x more strongly · same diffusivity"),
+          ("Kinetic-selective", "same isotherm for A and B · A diffuses 100x faster")]
+CALLOUT = ("At equilibrium B wins: same isotherm, but the gas is 70 % B.\n"
+           "Kinetic PSA ends the feed step long before this.")
 
 
 FPS, SECONDS = 30, 20
@@ -87,6 +89,10 @@ class Composer:
         self.cx = [scene.project(c)[0] for c in scene.centres]
         self.ramps = {k: loading_ramp(theme, k) for k in ("A", "B")}
         self.lt = np.log10(np.maximum(data.tt, 1e-3) / TAU)
+        qk = data.curves[1]
+        jpk = int(np.argmax(qk[0]))
+        jx = jpk + int(np.argmax(qk[1, jpk:] > qk[0, jpk:]))  # B overtakes A in the kinetic particle
+        self.lt_cross = self.lt[jx]
 
     def draw(self, img, t, j, out):
         T = self.T
@@ -106,6 +112,7 @@ class Composer:
             fig.text(0.5, 1 - 40 / H, f"t / τ$_A$ = {ttxt}", ha="center", va="top", fontsize=19,
                      color=T["ink"], family="DejaVu Sans Mono")
             self._legend(fig)
+            self._callout(fig, t)
             fig.text(24 / W, 18 / H, "Spherical diffusion models: macropore diffusion with near-local equilibrium (left), "
                      "Maxwell–Stefan micropore diffusion (right). Generic species, illustrative inputs; molecules not to scale.\n"
                      "Same feed step and clock for both: clean particles, gas switched to the column feed (30 % A) at t = 0. "
@@ -113,6 +120,18 @@ class Composer:
                      fontsize=11.5, color=T["muted"], va="bottom", linespacing=1.45)
             fig.savefig(out, dpi=100)
             plt.close(fig)
+
+    def _callout(self, fig, t):
+        """Kinetic particle: explain why B ends up ahead; fades in after B overtakes A."""
+        if t <= 0:
+            return
+        a = float(np.clip((np.log10(t / TAU) - self.lt_cross) / 0.25, 0.0, 1.0))
+        if a <= 0:
+            return
+        T = self.T
+        fig.text(self.cx[1] / W, 1 - 738 / H, CALLOUT, ha="center", va="center", fontsize=14.5, color=T["ink"],
+                 alpha=a, linespacing=1.4,
+                 bbox=dict(boxstyle="round,pad=0.45", fc=T["bg"], ec=T["B"], lw=1.4, alpha=0.92 * a))
 
     def _tags(self, fig, k):
         T = self.T

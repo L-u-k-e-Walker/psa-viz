@@ -62,5 +62,7 @@ Outcomes (`particle/run/uptake_metrics.json`): equilibrium particle, B
 overshoots to 1.23x its final loading at ~2 s and is displaced as A arrives
 (A half-time 1.1 s, done by ~30 s, final S = 10). Kinetic particle: A
 overshoots to 1.43x its final loading at ~36 s, then is slowly displaced by B
-(B half-time 230 s, done by ~10^4 s, final S = 1). Both overshoots are
+(B half-time 230 s, done by ~10^4 s, final S = 1). With the same isotherm for A and B, the
+final loadings follow the gas: q_B/q_A = 0.70/0.30 = 2.3, so B ends ahead; the render says so in
+a callout, and this is why a kinetic PSA keeps its feed step short. Both overshoots are
 predicted by the models, not added for the visual.
