@@ -101,3 +101,14 @@ particle clock log t/tau_A (0.7 s hold, sweep 10^-3 to 10^4.4, 2 s end hold).
 
 - README (outputs, what is simulated vs not to scale, pipeline, re-render commands, provenance),
   ../CLAUDE.md updated. Push pending: remote not created yet; ask the user first.
+
+## 2026-11-19 Fix: kinetic-particle wording (user feedback)
+
+- User: the kinetic particle said "equal affinity" but B ends with the higher loading. Not a model
+  error: b_A = b_B, the gas is 70 % B, so at equilibrium q_B/q_A = y_B/y_A = 2.3. User chose to keep
+  the physics and fix the wording (over raising b_A to 7/3 b_B or feeding the particles 50/50).
+- Subtitles now "same isotherm for A and B · A diffuses 100x faster" (kinetic) and
+  "A held 10x more strongly · same diffusivity" (equilibrium). A callout under the kinetic particle
+  fades in over 0.25 decades once q_B overtakes q_A (t/tau_A ≈ 250): "At equilibrium B wins: same
+  isotherm, but the gas is 70 % B. Kinetic PSA ends the feed step long before this."
+  Particle stills and all particle frames re-rendered (both themes).

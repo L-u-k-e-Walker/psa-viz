@@ -35,7 +35,7 @@ KINETIC = dict(
     radius=1.0e-3,  # m (same size as the pellet, so the two particles compare directly)
     density=1100.0,
     qs=(3.0, 3.0),
-    b=(0.25, 0.25),  # equal affinity: equilibrium selectivity 1
+    b=(0.25, 0.25),  # same isotherm: selectivity 1, so at equilibrium q_B/q_A = y_B/y_A = 2.3
     D_over_R2=(1.0e-2, 1.0e-4),  # 1/s, corrected (Maxwell-Stefan) diffusivity / R^2
 )
 

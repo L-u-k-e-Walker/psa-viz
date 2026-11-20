@@ -36,7 +36,7 @@ PowerPoint. Stills: `column/render/still_*.png`,
 |---|---|---|
 | Column | Isothermal, no axial pressure drop, extended Langmuir, LDF. Linear valves in pressurization/blowdown, fixed flow in feed/purge, light-product tank feeding the purge. A compact rewrite of psa-sim's flow-controlled model, matching psa-sim to ~1e-6 on the same case | `psaviz/column.py` |
 | Equilibrium particle | Macropore (Knudsen-type) diffusion with near-local equilibrium on the crystals; A held 10x more strongly, equal diffusivities | `psaviz/particle.py` |
-| Kinetic particle | Maxwell–Stefan/Langmuir micropore diffusion; A diffuses 100x faster, equal affinity | `psaviz/particle.py` |
+| Kinetic particle | Maxwell–Stefan/Langmuir micropore diffusion; A diffuses 100x faster, same isotherm for A and B. A leads early; at equilibrium B is loaded 2.3x more because the gas is 70 % B (an on-screen callout says so) | `psaviz/particle.py` |
 
 Column at CSS: B purity 99.86 %, B recovery 33.8 %, extract 39 % A (feed 30 %
 A), pressure ratio 4.2. The particle overshoots (B in the equilibrium particle,

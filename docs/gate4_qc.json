@@ -73,7 +73,7 @@
   "pix_fmt": "yuv420p",
   "fps": 30.0,
   "duration_s": 20.0,
-  "size_MB": 4.37,
+  "size_MB": 4.42,
   "checks": {
    "size": true,
    "frames": true,
@@ -91,7 +91,7 @@
   "pix_fmt": "bgra",
   "fps": 15.0,
   "duration_s": 20.0,
-  "size_MB": 31.51,
+  "size_MB": 31.71,
   "checks": {
    "size": true,
    "duration": true,
@@ -106,7 +106,7 @@
   "pix_fmt": "yuv420p",
   "fps": 30.0,
   "duration_s": 20.0,
-  "size_MB": 6.07,
+  "size_MB": 6.13,
   "checks": {
    "size": true,
    "frames": true,
@@ -124,7 +124,7 @@
   "pix_fmt": "bgra",
   "fps": 15.0,
   "duration_s": 20.0,
-  "size_MB": 36.59,
+  "size_MB": 36.76,
   "checks": {
    "size": true,
    "duration": true,
